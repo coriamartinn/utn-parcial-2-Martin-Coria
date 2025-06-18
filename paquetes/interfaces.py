@@ -67,32 +67,44 @@ def menu(pantalla: pg.display, nivel_actual="FACIL"):
 
 
 
-def interfaz_jugar(pantalla: pg.display, nivel="FACIL",) -> None:
+def interfaz_jugar(pantalla: pg.display, nivel="FACIL", tablero=None, tablero_disparos=None):
     """
     Esta funcion se encarga de dibujar en pantalla la interfaz del interfaz principal
     Args:
         pantalla (pg.display): Recibe el display de pantalla
     Returns:
         None: No existe retorno
-    """
+    """    
     if nivel != "FACIL" and nivel != "MEDIO" and nivel != "DIFICIL":
         nivel = "FACIL"
-    tablero = crear_tablero_con_naves(nivel)
-    imprimir_tablero(pantalla, tablero)
-     # Crear botón "Volver"
+
+    if tablero is None:
+        tablero = crear_tablero_con_naves(nivel)
+    if tablero_disparos is None:
+        tablero_disparos = crear_tablero_vacio(len(tablero))
+
+    imprimir_tablero(pantalla, tablero, tablero_disparos)
+
+    # Botón Volver
     pg.font.init()
     fuente = pg.font.SysFont("OCR A Extended", 30)
     texto_volver = fuente.render("Volver", True, (255, 255, 255))
-    rect_volver = texto_volver.get_rect(center=(955, 730))
-    fondo_volver = pg.Rect(
-        rect_volver.left - 10, rect_volver.top - 10,
-        rect_volver.width + 20, rect_volver.height + 20
-    )
-
+    rect_volver = texto_volver.get_rect(center=(955, 700))
+    fondo_volver = pg.Rect(rect_volver.left - 10, rect_volver.top - 10,
+                          rect_volver.width + 20, rect_volver.height + 20)
     pg.draw.rect(pantalla, (88, 6, 6), fondo_volver, border_radius=12)
     pantalla.blit(texto_volver, rect_volver)
 
-    return fondo_volver
+    # Botón Reiniciar
+    texto_reiniciar = fuente.render("Reiniciar", True, (255, 255, 255))
+    rect_reiniciar = texto_reiniciar.get_rect(center=(955, 760))
+    fondo_reiniciar = pg.Rect(rect_reiniciar.left - 10, rect_reiniciar.top - 10,
+                             rect_reiniciar.width + 20, rect_reiniciar.height + 20)
+    pg.draw.rect(pantalla, (6, 88, 6), fondo_reiniciar, border_radius=12)
+    pantalla.blit(texto_reiniciar, rect_reiniciar)
+
+    return fondo_volver, fondo_reiniciar
+
 
 
 def interfaz_puntajes(pantalla: pg.display) -> None:
@@ -173,3 +185,12 @@ def mostrar_selector_nivel(pantalla: pg.Surface) -> tuple:
         y += 100
 
     return rects["FACIL"], rects["MEDIO"], rects["DIFICIL"]
+
+def verificar_victoria(tablero, tablero_disparos):
+    victoria = True
+    for fila in range(len(tablero)):
+        for col in range(len(tablero[0])):
+            if tablero[fila][col] == 1 and tablero_disparos[fila][col] == 0:
+                victoria = False
+    return victoria
+

@@ -26,3 +26,5 @@ def verificar_estado(areas: tuple, posicion_click: tuple) -> str:
         estado = "SALIR"
         
     return estado
+
+
